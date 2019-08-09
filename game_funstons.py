@@ -78,6 +78,7 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bul
   if play_button.rect.collidepoint(mouse_x, mouse_y):
       button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
       if button_clicked and not stats.game_active:
+        ai_settings.initialize_dynamic_settings()
         pygame.mouse.set_visible(False)
         stats.reset_stats()
         stats.game_active = True
@@ -99,7 +100,6 @@ def check_events(ai_settings, screen,stats, play_button, ship, aliens, bullets):
             mouse_x, mouse_y = pygame.mouse.get_pos()
             check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y)
 
-
 def check_keydown_events(event, ai_settings, screen, ship, bullets):
     if event.key == pygame.K_RIGHT:
         ship.moving_right = True
@@ -120,7 +120,6 @@ def fire_bullet(ai_settings, screen, ship, bullets):
         new_bullet = Bullet(ai_settings, screen, ship)
         bullets.add(new_bullet)
 
-
 def check_keyup_events(event, ship):
     if event.key == pygame.K_RIGHT:
         ship.moving_right = False
@@ -139,7 +138,7 @@ def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button
     ship.blitme()
     aliens.draw(screen)
     if not stats.game_active:
-        play_button.draw_button()
+        play_button.draw_button(ai_settings, screen)
     pygame.display.flip()
 
 
@@ -155,4 +154,5 @@ def check_bullet_alien_collision(ai_settings, screen, ship, aliens, bullets):
     collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
     if len(aliens) == 0:
         bullets.empty()
+        ai_settings.increase_speed()
         create_fleet(ai_settings, screen, ship, aliens)
